@@ -47,7 +47,7 @@ def enter_date(update: Update, context: CallbackContext):
     print('enter date')
     reply_keyboard = Markups.date
     markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-    update.message.reply_text("Введите дату в формате ДД.ММ.ГГ или выберите из вариантов внизу", reply_markup= markup)
+    update.message.reply_text("Введите дату в формате ДД.ММ.ГГ или выберите из вариантов внизу", reply_markup=markup)
     return 1
 
 def enter_result(update: Update, context: CallbackContext):
@@ -57,17 +57,27 @@ def enter_result(update: Update, context: CallbackContext):
         date = datetime.date.today()
     elif date == Markups.date[0][1]:
         date = datetime.date.today() - datetime.timedelta(days = 1)
+    else:
     
+        dateFormatter = "%d.%m.%y"
+        date = datetime.datetime.strptime(date, dateFormatter)
     
-    dateFormatter = "%d.%m.%y"
-    date = datetime.datetime.strptime(date, dateFormatter)
-    update.message.reply_text("Введите результат")
+    reply_keyboard = Markups.result
+    markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+    update.message.reply_text("Введите результат", reply_markup=markup)
     return 2
 
 def data_added(update: Update, context: CallbackContext):
     global date
-    result = int(update.message.text)
-    status = add_score(date, result, update.message.chat_id)
+    result = update.message.text
+    if result == Markups.result[0][0]:
+        points = 1
+    elif result == Markups.result[0][1]:
+        points = 0
+    else:
+        update.message.reply_text('Воспользуйтесь кнопками внизу')
+        return 2
+    status = add_score(date, points, update.message.chat_id)
 
 
     reply_keyboard = Markups.start
